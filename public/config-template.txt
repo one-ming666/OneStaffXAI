@@ -1,0 +1,29 @@
+OpenHex API 地址
+https://api.openhex.tech
+OpenHex API Key
+请替换为你自己的个人API Key
+Agent ID
+researcher: 请替换为研究员工UUID
+analyst: 请替换为分析员工UUID
+writer: 请替换为文案员工UUID
+designer: 请替换为设计员工UUID
+coder: 请替换为编程员工UUID
+豆包 · 拟人交流
+请替换为实际模型ID
+https://ark.cn-beijing.volces.com/api/v3
+API
+请替换为方舟文本API Key
+豆包 · 编程与工具规划
+请替换为实际模型ID
+https://ark.cn-beijing.volces.com/api/v3
+豆包 · 总监深度推理
+请替换为实际模型ID
+https://ark.cn-beijing.volces.com/api/v3
+DeepSeek · 快速备选
+请替换为实际模型ID
+https://api.deepseek.com
+API
+请替换为DeepSeek API Key
+DeepSeek · 独立监察
+请替换为实际模型ID
+https://api.deepseek.com

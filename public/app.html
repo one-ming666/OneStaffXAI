@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#eef5ff" />
+    <title>One Staff X AI · 智能工作空间</title>
+    <link rel="stylesheet" href="/assets/app.css?v=20260919" />
+    <link rel="stylesheet" href="/assets/components.css?v=20260919-chat-scroll" />
+    <link rel="stylesheet" href="/assets/layout.css?v=20260919-layout" />
+    <style>
+      #app {
+        position: relative;
+        z-index: 1;
+      }
+      #startup-status {
+        max-width: 680px;
+        margin: 12vh auto;
+        padding: 32px;
+        font: 16px/1.8 system-ui;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(130, 170, 230, 0.25);
+        border-radius: 22px;
+        color: #192d49;
+        box-shadow: 0 24px 70px rgba(49, 86, 140, 0.12);
+      }
+      #startup-status a {
+        color: #2867da;
+        text-decoration: underline;
+        margin-right: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ambient"></div>
+    <div id="app">
+      <section id="startup-status">
+        <h1 id="startup-title">正在打开智能空间</h1>
+        <p id="startup-detail">正在连接本地服务并加载工作空间…</p>
+        <p>
+          <a href="/api/health" target="_blank">检查后端</a
+          ><a href="/app.html?reload=20260919#onboarding">重新加载</a>
+        </p>
+        <small>产品修订 20260919</small>
+        <noscript><p>浏览器禁用了 JavaScript，请允许本站运行 JavaScript 后刷新。</p></noscript>
+      </section>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="dialog"></dialog>
+    <script>
+      (() => {
+        let finished = false;
+        const report = (message) => {
+          if (finished) return;
+          const box = document.getElementById("startup-status");
+          if (!box) return;
+          document.getElementById("startup-title").textContent = "工作空间启动未完成";
+          document.getElementById("startup-detail").textContent = message;
+        };
+        window.addEventListener("error", (e) =>
+          report(
+            "脚本错误：" + (e.message || "资源加载失败") + " " + (e.filename || "") + ":" + (e.lineno || ""),
+          ),
+        );
+        window.addEventListener("unhandledrejection", (e) =>
+          report("启动错误：" + String(e.reason?.message || e.reason)),
+        );
+        window.addEventListener("onestaff:ready", () => {
+          finished = true;
+        });
+        setTimeout(
+          () => report("启动超过20秒。请点击“检查后端”确认服务是否返回 ok:true。当前修订：20260919。"),
+          20000,
+        );
+      })();
+    </script>
+    <script src="/assets/workspace-runtime.js?v=20260919"></script>
+    <script src="/assets/app.js?v=20260919-layout"></script>
+  </body>
+</html>

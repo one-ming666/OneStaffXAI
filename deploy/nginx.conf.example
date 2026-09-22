@@ -1,0 +1,15 @@
+# 放入现有HTTPS站点的server块内；将域名/证书交由宝塔站点设置管理。
+# 不要覆盖服务器上的其他站点。
+location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 660s;
+    proxy_send_timeout 660s;
+    client_max_body_size 24m;
+}

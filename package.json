@@ -1,0 +1,41 @@
+{
+  "name": "onestaffxai",
+  "version": "2026.9.19",
+  "description": "OneStaff X AI workspace with OpenHex agents, document delivery and independent review",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "dev": "node --watch --env-file-if-exists=.env server/index.js",
+    "test": "npm run test:offline && npm run test:integration",
+    "check": "node scripts/check-source.mjs",
+    "test:offline": "node --test tests/transport.test.js tests/storage.test.js tests/static-ux.test.js tests/services.test.js tests/models.test.js tests/artifacts.test.js",
+    "test:integration": "node --test tests/integration.test.js",
+    "test:browser": "node tests/browser-check.mjs"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    },
+    "pptxgenjs": {
+      "image-size": "2.0.4"
+    }
+  },
+  "dependencies": {
+    "@openhex-ai/agent-sdk": "0.5.1",
+    "docx": "8.5.0",
+    "exceljs": "4.4.0",
+    "express": "4.22.3",
+    "fontkit": "1.9.0",
+    "jszip": "3.10.1",
+    "mammoth": "1.12.3",
+    "multer": "2.4.0",
+    "pdf-parse": "2.4.5",
+    "pdfkit": "0.15.2",
+    "pptxgenjs": "3.12.0",
+    "qrcode": "1.5.4"
+  }
+}

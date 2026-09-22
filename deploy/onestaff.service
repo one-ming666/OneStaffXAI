@@ -1,0 +1,18 @@
+[Unit]
+Description=OneStaff X AI
+After=network.target
+
+[Service]
+Type=simple
+User=www
+WorkingDirectory=/www/wwwroot/OneStaffXAI
+# 用 command -v node 查找你的实际Node路径后替换。
+ExecStart=/usr/bin/node --env-file-if-exists=.env server/index.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

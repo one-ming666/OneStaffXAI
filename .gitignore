@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Runtime state / secrets — never commit
+.env
+.env.*
+!.env.example
+data/
+backups/
+
+# Generated test / coverage output
+test-results/
+playwright-report/
+coverage/
+
+# Logs and diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+startup_diagnostic.txt
+
+# Temporary files
+.cache/
+.tmp/
+tmp/
+temp/
+
+# Local editor / OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Optional locally supplied PDF fonts
+server/fonts/*.ttf
+server/fonts/*.ttc
+server/fonts/*.otf

@@ -1,0 +1,13 @@
+services:
+  onestaff:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      HOST: 0.0.0.0
+      DATA_DIR: /app/data
+    volumes:
+      - onestaff-data:/app/data
+volumes:
+  onestaff-data:

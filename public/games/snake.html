@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>贪吃蛇 · Snake</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1220'/%3E%3Crect x='4' y='6' width='14' height='12' rx='3' fill='%234ade80'/%3E%3Crect x='14' y='13' width='13' height='10' rx='3' fill='%2322c55e'/%3E%3Ccircle cx='10' cy='11' r='2.2' fill='%23f8fafc'/%3E%3Ccircle cx='10.9' cy='11.5' r='1.1' fill='%230b1220'/%3E%3Ccircle cx='21' cy='17' r='2.2' fill='%23f8fafc'/%3E%3Ccircle cx='21.9' cy='17.5' r='1.1' fill='%230b1220'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Press+Start+2P&display=swap" />
+    <style>
+      :root {
+        --bg: #0b1220;
+        --panel: #101a2e;
+        --line: #1e2b45;
+        --text: #e6edf7;
+        --muted: #8aa0c0;
+        --accent: #4ade80;
+        --accent-2: #fbbf24;
+        --danger: #f87171;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: radial-gradient(1200px 700px at 50% -10%, #14203a 0%, transparent 60%), var(--bg);
+        color: var(--text);
+        font-family:
+          "PingFang SC",
+          "Microsoft YaHei",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 16px;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .app {
+        width: min(92vw, 60vh, 520px);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      header.top {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      h1 {
+        font-size: 26px;
+        letter-spacing: 0.12em;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .dot {
+        color: var(--accent);
+      }
+      .stats {
+        display: flex;
+        gap: 8px;
+      }
+      .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 6px 12px;
+        text-align: right;
+        min-width: 76px;
+      }
+      .stat .label {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        letter-spacing: 0.08em;
+      }
+      .stat .num {
+        font-family: "Press Start 2P", "Courier New", monospace;
+        font-size: 15px;
+        color: var(--text);
+      }
+      .stat.best .num {
+        color: var(--accent-2);
+      }
+      .board {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1/1;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow:
+          0 18px 50px rgba(0, 0, 0, 0.42),
+          inset 0 0 60px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        touch-action: none;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .board::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+        background: radial-gradient(120% 120% at 50% 42%, transparent 55%, rgba(0, 0, 0, 0.32) 100%);
+      }
+      .overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        text-align: center;
+        padding: 20px;
+        background: rgba(8, 13, 24, 0.74);
+        backdrop-filter: blur(3px);
+      }
+      .overlay.hidden {
+        display: none;
+      }
+      .ov-title {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+      }
+      .ov-sub {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+        max-width: 30em;
+      }
+      .ov-score {
+        font-family: "Press Start 2P", monospace;
+        font-size: 14px;
+        color: var(--accent-2);
+        line-height: 1.9;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      .btn {
+        border: 0;
+        border-radius: 12px;
+        background: var(--accent);
+        color: #06230f;
+        font-weight: 800;
+        font-size: 16px;
+        padding: 12px 36px;
+        transition:
+          transform 0.12s ease,
+          filter 0.12s ease;
+      }
+      .btn:hover {
+        filter: brightness(1.08);
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .hint {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.9;
+      }
+      .mute {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 6;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: rgba(16, 26, 46, 0.82);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .mute:hover {
+        color: var(--text);
+      }
+      footer.bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .diff {
+        display: flex;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 3px;
+        gap: 3px;
+      }
+      .diff button {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 12px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 8px;
+        transition:
+          background 0.12s ease,
+          color 0.12s ease;
+      }
+      .diff button:hover {
+        color: var(--text);
+      }
+      .diff button.on {
+        background: var(--accent);
+        color: #06230f;
+      }
+      .keys {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      kbd {
+        font-family: inherit;
+        background: #16233c;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-size: 11px;
+      }
+      .dpad {
+        display: none;
+      }
+      .toast {
+        position: absolute;
+        left: 50%;
+        bottom: 14px;
+        z-index: 7;
+        transform: translateX(-50%) translateY(8px);
+        background: #16233c;
+        border: 1px solid var(--line);
+        color: var(--text);
+        font-size: 12px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        opacity: 0;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      @media (pointer: coarse) {
+        .dpad {
+          display: grid;
+          grid-template-columns: repeat(3, 56px);
+          grid-template-rows: repeat(2, 52px);
+          gap: 6px;
+          justify-content: center;
+        }
+        .dpad button {
+          border: 1px solid var(--line);
+          background: var(--panel);
+          color: var(--muted);
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 900;
+          touch-action: none;
+          user-select: none;
+          -webkit-user-select: none;
+          transition:
+            background 0.1s ease,
+            color 0.1s ease;
+        }
+        .dpad button:active {
+          background: var(--accent);
+          color: #06230f;
+        }
+        .dpad .u {
+          grid-area: 1/2;
+        }
+        .dpad .l {
+          grid-area: 2/1;
+        }
+        .dpad .d {
+          grid-area: 2/2;
+        }
+        .dpad .r {
+          grid-area: 2/3;
+        }
+        .keys {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .diff button,
+        .dpad button {
+          transition: none;
+        }
+        .toast {
+          transition: none;
+        }
+      }
+      @media (max-height: 720px) {
+        .app {
+          gap: 10px;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        .ov-title {
+          font-size: 30px;
+        }
+        .stat {
+          padding: 5px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="top">
+        <h1>贪吃<span class="dot">蛇</span></h1>
+        <div class="stats">
+          <div class="stat"><span class="label">得分</span><span class="num" id="score">0</span></div>
+          <div class="stat best"><span class="label">最高</span><span class="num" id="best">0</span></div>
+        </div>
+      </header>
+
+      <div class="board" id="board">
+        <canvas id="game"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="ov-title" id="ov-title">贪吃<span class="dot">蛇</span></div>
+          <p class="ov-sub" id="ov-sub">吃掉食物变长，别撞墙也别咬到自己</p>
+          <div class="ov-score" id="ov-score" style="display: none"></div>
+          <button class="btn" id="primary">开始游戏</button>
+          <p class="hint">方向键 / WASD 移动 · 空格暂停 · R 重开</p>
+        </div>
+        <button class="mute" id="mute" role="switch" aria-checked="true" aria-label="声音开关">
+          <svg
+            class="ic-on"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M11 5 6 9H2v6h4l5 4V5z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+          </svg>
+          <svg
+            class="ic-off"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="display: none"
+            aria-hidden="true"
+          >
+            <path d="M11 5 6 9H2v6h4l5 4V5z" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        </button>
+        <div class="toast" id="toast"></div>
+      </div>
+
+      <footer class="bar">
+        <div class="diff" id="diff" aria-label="难度选择">
+          <button data-d="easy">简单</button>
+          <button data-d="normal" class="on">普通</button>
+          <button data-d="hard">困难</button>
+        </div>
+        <span class="keys"><kbd>↑↓←→</kbd> / <kbd>WASD</kbd> 移动</span>
+      </footer>
+
+      <div class="dpad" id="dpad" aria-label="方向控制">
+        <button class="u" data-dir="up" aria-label="向上">▲</button>
+        <button class="l" data-dir="left" aria-label="向左">◀</button>
+        <button class="d" data-dir="down" aria-label="向下">▼</button>
+        <button class="r" data-dir="right" aria-label="向右">▶</button>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var COLS = 21,
+          ROWS = 21;
+        var board = document.getElementById("board");
+        var canvas = document.getElementById("game");
+        var ctx = canvas.getContext("2d");
+        var overlay = document.getElementById("overlay");
+        var ovTitle = document.getElementById("ov-title");
+        var ovSub = document.getElementById("ov-sub");
+        var ovScore = document.getElementById("ov-score");
+        var primary = document.getElementById("primary");
+        var scoreEl = document.getElementById("score");
+        var bestEl = document.getElementById("best");
+        var muteBtn = document.getElementById("mute");
+        var toastEl = document.getElementById("toast");
+        var diffEl = document.getElementById("diff");
+        var DIRS = {
+          up: [0, -1],
+          down: [0, 1],
+          left: [-1, 0],
+          right: [1, 0],
+        };
+        var OPP = {
+          up: "down",
+          down: "up",
+          left: "right",
+          right: "left",
+        };
+        var DIFF_NAME = {
+          easy: "简单",
+          normal: "普通",
+          hard: "困难",
+        };
+        var DIFF_BASE = {
+          easy: 185,
+          normal: 140,
+          hard: 95,
+        };
+        var cell = 20,
+          size = 0;
+        var snake = [],
+          dir = "right",
+          queue = [];
+        var food = null,
+          bonus = null,
+          bonusTimer = 0;
+        var score = 0,
+          eaten = 0,
+          best = 0,
+          difficulty = "normal";
+        var state = "idle";
+        var acc = 0,
+          last = 0,
+          raf = 0,
+          time = 0;
+        var soundOn,
+          actx = null,
+          toastTimer = 0;
+        var isTouch = matchMedia("(pointer:coarse)").matches;
+        try {
+          var saved = localStorage.getItem("snake-sound");
+          soundOn = saved === null ? !isTouch : saved === "1";
+          best = parseInt(localStorage.getItem("snake-best"), 10) || 0;
+        } catch (e) {
+          soundOn = !isTouch;
+          best = 0;
+        }
+        function lerp(a, b, t) {
+          return a + (b - a) * t;
+        }
+        function clamp(v, a, b) {
+          return Math.max(a, Math.min(b, v));
+        }
+        function rr(c, x, y, w, h, r) {
+          c.beginPath();
+          c.moveTo(x + r, y);
+          c.arcTo(x + w, y, x + w, y + h, r);
+          c.arcTo(x + w, y + h, x, y + h, r);
+          c.arcTo(x, y + h, x, y, r);
+          c.arcTo(x, y, x + w, y, r);
+          c.closePath();
+        }
+        function resize() {
+          var rect = board.getBoundingClientRect();
+          size = Math.max(10, Math.floor(Math.min(rect.width, rect.height)));
+          var dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.style.width = size + "px";
+          canvas.style.height = size + "px";
+          canvas.width = Math.round(size * dpr);
+          canvas.height = Math.round(size * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          cell = size / COLS;
+        }
+        new ResizeObserver(resize).observe(board);
+        function reset() {
+          var cy = Math.floor(ROWS / 2),
+            cx = Math.floor(COLS / 2);
+          snake = [
+            [cx, cy],
+            [cx - 1, cy],
+            [cx - 2, cy],
+            [cx - 3, cy],
+          ];
+          dir = "right";
+          queue = [];
+          score = 0;
+          eaten = 0;
+          bonus = null;
+          bonusTimer = 0;
+          updateHud();
+          spawnFood();
+        }
+        function emptyCells() {
+          var used = {};
+          for (var i = 0; i < snake.length; i++) used[snake[i][0] + "," + snake[i][1]] = true;
+          if (bonus) used[bonus[0] + "," + bonus[1]] = true;
+          var cells = [];
+          for (var x = 0; x < COLS; x++)
+            for (var y = 0; y < ROWS; y++) {
+              if (!used[x + "," + y]) cells.push([x, y]);
+            }
+          return cells;
+        }
+        function randomCell() {
+          var c = emptyCells();
+          return c.length ? c[Math.floor(Math.random() * c.length)] : null;
+        }
+        function spawnFood() {
+          food = randomCell();
+          if (!food) win();
+        }
+        function spawnBonus() {
+          var c = randomCell();
+          if (c) {
+            bonus = c;
+            bonusTimer = 7000;
+          }
+        }
+        function interval() {
+          return Math.max(70, DIFF_BASE[difficulty] - eaten * 2);
+        }
+        function tick() {
+          while (queue.length) {
+            var d = queue.shift();
+            if (d !== dir && OPP[d] !== dir) {
+              dir = d;
+              break;
+            }
+          }
+          var mv = DIRS[dir],
+            head = snake[0];
+          var nx = head[0] + mv[0],
+            ny = head[1] + mv[1];
+          if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) {
+            gameOver();
+            return;
+          }
+          var ate = false;
+          if (food && food[0] === nx && food[1] === ny) {
+            ate = true;
+            score += 10;
+            eaten++;
+            updateHud();
+            playEat();
+            spawnFood();
+            if (eaten % 3 === 0) spawnBonus();
+          }
+          if (bonus && bonus[0] === nx && bonus[1] === ny) {
+            ate = true;
+            score += 50;
+            updateHud();
+            playBonus();
+            bonus = null;
+            bonusTimer = 0;
+          }
+          var body = ate ? snake : snake.slice(0, -1);
+          for (var i = 0; i < body.length; i++) {
+            if (body[i][0] === nx && body[i][1] === ny) {
+              gameOver();
+              return;
+            }
+          }
+          snake = [[nx, ny]].concat(body);
+        }
+        function win() {
+          score += 100;
+          updateHud();
+          playBonus();
+          state = "over";
+          renderOverlay();
+        }
+        function gameOver() {
+          state = "over";
+          playOver();
+          if (score > best) {
+            best = score;
+            bestEl.textContent = best;
+            try {
+              localStorage.setItem("snake-best", best);
+            } catch (e) {}
+          }
+          renderOverlay();
+        }
+        function startGame() {
+          reset();
+          state = "running";
+          hideOverlay();
+          ensureAudio();
+          last = performance.now();
+        }
+        function pause() {
+          if (state === "running") {
+            state = "paused";
+            renderOverlay();
+          }
+        }
+        function resume() {
+          if (state === "paused") {
+            state = "running";
+            hideOverlay();
+            last = performance.now();
+          }
+        }
+        function restart() {
+          reset();
+          state = "running";
+          hideOverlay();
+          ensureAudio();
+          last = performance.now();
+        }
+        function updateHud() {
+          scoreEl.textContent = score;
+          bestEl.textContent = Math.max(best, score);
+        }
+        function renderOverlay() {
+          overlay.classList.remove("hidden");
+          ovScore.style.display = "none";
+          if (state === "idle") {
+            ovTitle.innerHTML = '贪吃<span class="dot">蛇</span>';
+            ovSub.textContent = "吃掉食物变长，别撞墙也别咬到自己";
+            primary.textContent = "开始游戏";
+          } else if (state === "paused") {
+            ovTitle.textContent = "已暂停";
+            ovSub.textContent = "按空格或点击下方按钮继续";
+            primary.textContent = "继续游戏";
+          } else if (state === "over") {
+            ovTitle.textContent = "游戏结束";
+            ovSub.textContent = "别灰心，再来一局刷新纪录";
+            ovScore.style.display = "";
+            ovScore.textContent = "得分 " + score + "  ·  最高 " + best;
+            primary.textContent = "再来一局";
+          }
+        }
+        function hideOverlay() {
+          overlay.classList.add("hidden");
+        }
+        function toast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add("show");
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(function () {
+            toastEl.classList.remove("show");
+          }, 1600);
+        }
+        function primaryClick() {
+          ensureAudio();
+          if (state === "idle") startGame();
+          else if (state === "paused") resume();
+          else if (state === "over") restart();
+        }
+        primary.addEventListener("click", primaryClick);
+        var diffBtns = diffEl.querySelectorAll("button");
+        function setDifficulty(d) {
+          if (d === difficulty) return;
+          difficulty = d;
+          for (var i = 0; i < diffBtns.length; i++) {
+            diffBtns[i].classList.toggle("on", diffBtns[i].getAttribute("data-d") === d);
+          }
+          reset();
+          if (state === "running" || state === "paused") {
+            state = "running";
+            hideOverlay();
+          } else {
+            state = "idle";
+            renderOverlay();
+          }
+          toast("难度：" + DIFF_NAME[d]);
+        }
+        for (var bi = 0; bi < diffBtns.length; bi++) {
+          (function (btn) {
+            btn.addEventListener("click", function () {
+              ensureAudio();
+              playClick();
+              setDifficulty(btn.getAttribute("data-d"));
+            });
+          })(diffBtns[bi]);
+        }
+        function ensureAudio() {
+          if (!actx) {
+            try {
+              actx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {}
+          }
+          if (actx && actx.state === "suspended") actx.resume();
+        }
+        function tone(freq, dur, type, vol, delay, slideTo) {
+          if (!actx || !soundOn) return;
+          delay = delay || 0;
+          var t0 = actx.currentTime + delay;
+          var o = actx.createOscillator(),
+            g = actx.createGain();
+          o.type = type;
+          o.frequency.setValueAtTime(freq, t0);
+          if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          o.connect(g);
+          g.connect(actx.destination);
+          o.start(t0);
+          o.stop(t0 + dur + 0.03);
+        }
+        var playEat = function () {
+          tone(430, 0.1, "square", 0.22, 0, 660);
+        };
+        var playBonus = function () {
+          tone(660, 0.09, "square", 0.2);
+          tone(880, 0.13, "square", 0.2, 0.09);
+        };
+        var playOver = function () {
+          tone(300, 0.4, "sawtooth", 0.18, 0, 85);
+        };
+        var playClick = function () {
+          tone(520, 0.05, "square", 0.1);
+        };
+        function setSound(v) {
+          soundOn = v;
+          try {
+            localStorage.setItem("snake-sound", v ? "1" : "0");
+          } catch (e) {}
+          muteBtn.setAttribute("aria-checked", v ? "true" : "false");
+          muteBtn.querySelector(".ic-on").style.display = v ? "" : "none";
+          muteBtn.querySelector(".ic-off").style.display = v ? "none" : "";
+        }
+        muteBtn.addEventListener("click", function () {
+          ensureAudio();
+          setSound(!soundOn);
+          playClick();
+        });
+        setSound(soundOn);
+        function setDir(d) {
+          if (state !== "running") return;
+          if (queue.length < 2) queue.push(d);
+        }
+        var KEYMAP = {
+          ArrowUp: "up",
+          KeyW: "up",
+          ArrowDown: "down",
+          KeyS: "down",
+          ArrowLeft: "left",
+          KeyA: "left",
+          ArrowRight: "right",
+          KeyD: "right",
+        };
+        window.addEventListener("keydown", function (e) {
+          var k = e.code;
+          if (k === "Space") {
+            e.preventDefault();
+            if (state === "running") pause();
+            else if (state === "paused") resume();
+            return;
+          }
+          if (k === "Enter") {
+            e.preventDefault();
+            primaryClick();
+            return;
+          }
+          if (k === "KeyR") {
+            e.preventDefault();
+            if (state === "running" || state === "paused" || state === "over") {
+              restart();
+            }
+            return;
+          }
+          if (KEYMAP[k]) {
+            e.preventDefault();
+            setDir(KEYMAP[k]);
+          }
+        });
+        var dpad = document.getElementById("dpad");
+        var dpadBtns = dpad.querySelectorAll("button");
+        for (var di = 0; di < dpadBtns.length; di++) {
+          (function (btn) {
+            btn.addEventListener("click", function () {
+              ensureAudio();
+              setDir(btn.getAttribute("data-dir"));
+            });
+          })(dpadBtns[di]);
+        }
+        var sx = 0,
+          sy = 0,
+          swiping = false;
+        board.addEventListener(
+          "touchstart",
+          function (e) {
+            var t = e.touches[0];
+            sx = t.clientX;
+            sy = t.clientY;
+            swiping = true;
+          },
+          {
+            passive: true,
+          },
+        );
+        board.addEventListener(
+          "touchmove",
+          function (e) {
+            if (!swiping) return;
+            var t = e.touches[0],
+              dx = t.clientX - sx,
+              dy = t.clientY - sy;
+            if (Math.abs(dx) > 26 || Math.abs(dy) > 26) {
+              if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? "right" : "left");
+              else setDir(dy > 0 ? "down" : "up");
+              sx = t.clientX;
+              sy = t.clientY;
+            }
+          },
+          {
+            passive: true,
+          },
+        );
+        board.addEventListener(
+          "touchend",
+          function () {
+            swiping = false;
+          },
+          {
+            passive: true,
+          },
+        );
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden && state === "running") pause();
+        });
+        window.addEventListener("blur", function () {
+          if (state === "running") pause();
+        });
+        function draw() {
+          ctx.fillStyle = "#0d1728";
+          ctx.fillRect(0, 0, size, size);
+          ctx.fillStyle = "rgba(255,255,255,0.045)";
+          var dotR = Math.max(1, cell * 0.06);
+          for (var x = 0; x < COLS; x++)
+            for (var y = 0; y < ROWS; y++) {
+              ctx.beginPath();
+              ctx.arc((x + 0.5) * cell, (y + 0.5) * cell, dotR, 0, 6.2832);
+              ctx.fill();
+            }
+          if (bonus) drawBonus();
+          if (food) drawFood();
+          drawSnake();
+        }
+        function starPath(c, cx, cy, outer, inner) {
+          c.beginPath();
+          for (var i = 0; i < 10; i++) {
+            var rad = i % 2 === 0 ? outer : inner;
+            var a = -Math.PI / 2 + (i * Math.PI) / 5;
+            var px = cx + Math.cos(a) * rad,
+              py = cy + Math.sin(a) * rad;
+            if (i === 0) c.moveTo(px, py);
+            else c.lineTo(px, py);
+          }
+          c.closePath();
+        }
+        function drawFood() {
+          var cx = (food[0] + 0.5) * cell,
+            cy = (food[1] + 0.5) * cell;
+          var pulse = 1 + 0.1 * Math.sin(time / 260);
+          var rad = cell * 0.32 * pulse;
+          var g = ctx.createRadialGradient(cx - rad * 0.35, cy - rad * 0.4, rad * 0.1, cx, cy, rad);
+          g.addColorStop(0, "#fda4a4");
+          g.addColorStop(0.55, "#ef4444");
+          g.addColorStop(1, "#b91c1c");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(cx, cy, rad, 0, 6.2832);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255,255,255,0.75)";
+          ctx.beginPath();
+          ctx.arc(cx - rad * 0.28, cy - rad * 0.3, rad * 0.18, 0, 6.2832);
+          ctx.fill();
+          ctx.fillStyle = "#4ade80";
+          ctx.beginPath();
+          ctx.ellipse(cx + rad * 0.5, cy - rad * 0.55, rad * 0.24, rad * 0.12, -0.6, 0, 6.2832);
+          ctx.fill();
+        }
+        function drawBonus() {
+          var cx = (bonus[0] + 0.5) * cell,
+            cy = (bonus[1] + 0.5) * cell;
+          var pulse = 1 + 0.12 * Math.sin(time / 180);
+          var rad = cell * 0.36 * pulse;
+          ctx.save();
+          ctx.shadowColor = "rgba(251,191,36,0.8)";
+          ctx.shadowBlur = 12;
+          starPath(ctx, cx, cy, rad, rad * 0.45);
+          ctx.fillStyle = "#fbbf24";
+          ctx.fill();
+          ctx.restore();
+          var frac = clamp(bonusTimer / 7000, 0, 1);
+          ctx.strokeStyle = "rgba(251,191,36,0.55)";
+          ctx.lineWidth = Math.max(1.5, cell * 0.07);
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(cx, cy, cell * 0.46, -Math.PI / 2, -Math.PI / 2 + 6.2832 * frac);
+          ctx.stroke();
+        }
+        function drawSnake() {
+          var n = snake.length;
+          for (var i = n - 1; i >= 0; i--) {
+            var t = i / Math.max(1, n - 1),
+              r,
+              g,
+              b;
+            if (t < 0.5) {
+              r = lerp(22, 34, t * 2);
+              g = lerp(163, 197, t * 2);
+              b = lerp(94, 94, t * 2);
+            } else {
+              r = lerp(34, 134, (t - 0.5) * 2);
+              g = lerp(197, 239, (t - 0.5) * 2);
+              b = lerp(94, 172, (t - 0.5) * 2);
+            }
+            var pad = cell * 0.07;
+            ctx.fillStyle = "rgb(" + (r | 0) + "," + (g | 0) + "," + (b | 0) + ")";
+            rr(
+              ctx,
+              snake[i][0] * cell + pad / 2,
+              snake[i][1] * cell + pad / 2,
+              cell - pad,
+              cell - pad,
+              cell * 0.28,
+            );
+            ctx.fill();
+          }
+          var mv = DIRS[dir],
+            hx = snake[0][0],
+            hy = snake[0][1];
+          var hcx = (hx + 0.5) * cell,
+            hcy = (hy + 0.5) * cell;
+          var perp = [-mv[1], mv[0]];
+          var fwd = cell * 0.16,
+            side = cell * 0.16;
+          for (var s = 1; s >= -1; s -= 2) {
+            var ex = hcx + mv[0] * fwd + perp[0] * side * s;
+            var ey = hcy + mv[1] * fwd + perp[1] * side * s;
+            ctx.fillStyle = "#f8fafc";
+            ctx.beginPath();
+            ctx.arc(ex, ey, cell * 0.13, 0, 6.2832);
+            ctx.fill();
+            ctx.fillStyle = "#0b1220";
+            ctx.beginPath();
+            ctx.arc(ex + mv[0] * cell * 0.05, ey + mv[1] * cell * 0.05, cell * 0.065, 0, 6.2832);
+            ctx.fill();
+          }
+        }
+        function loop(t) {
+          raf = requestAnimationFrame(loop);
+          var dt = clamp(t - last, 0, 100);
+          last = t;
+          time = t;
+          if (state === "running") {
+            acc += dt;
+            var iv = interval();
+            while (acc >= iv) {
+              acc -= iv;
+              tick();
+              if (state !== "running") break;
+            }
+            if (bonus) {
+              bonusTimer -= dt;
+              if (bonusTimer <= 0) {
+                bonus = null;
+                bonusTimer = 0;
+              }
+            }
+          }
+          draw();
+        }
+        reset();
+        updateHud();
+        renderOverlay();
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      })();
+    </script>
+  </body>
+</html>

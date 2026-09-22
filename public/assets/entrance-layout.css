@@ -1,0 +1,227 @@
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+  }
+  body {
+    padding-bottom: 0;
+  }
+  .top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 76px;
+    padding: 12px 20px;
+  }
+  .top .slogan {
+    display: none;
+  }
+  .brand-image {
+    width: 215px;
+    max-width: 75vw;
+  }
+  .stage.redesigned {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    max-width: 620px;
+    overflow: visible;
+    padding: 88px 16px 30px;
+    gap: 16px;
+    align-items: start;
+  }
+  .welcome-scene {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 138px;
+    min-height: 138px;
+    margin: 0;
+    padding: 14px 8px;
+    align-self: start;
+  }
+  .welcome-scene h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    padding-right: 120px;
+  }
+  .scene-eyebrow {
+    font-size: 9px;
+    margin-bottom: 9px;
+  }
+  .scene-desc {
+    font-size: 11px;
+    margin-top: 8px;
+    padding-right: 100px;
+    max-width: 100%;
+  }
+  .mascot-scene {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 115px;
+    height: 140px;
+    margin: 0;
+    transform: none;
+  }
+  .mascot {
+    height: 140px;
+    max-height: 140px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .hello-note {
+    display: none;
+  }
+  .panel.access {
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 24px 20px 16px;
+    justify-self: stretch;
+    border-radius: 24px;
+    overflow: visible;
+  }
+  .access-title {
+    font-size: 24px;
+  }
+  .access-eyebrow {
+    font-size: 10px;
+  }
+  .panel .desc {
+    font-size: 12px;
+  }
+  .unlock-tabs {
+    width: 100%;
+    margin: 16px 0;
+  }
+  .unlock-tabs button {
+    min-width: 0;
+    min-height: 42px;
+  }
+  .keypad {
+    max-width: 310px;
+    width: 100%;
+    gap: 8px;
+  }
+  .key {
+    height: 44px;
+    padding: 7px;
+    font-size: 20px;
+  }
+  .pass-display {
+    margin: 12px 0 18px;
+    gap: 12px;
+  }
+  .pass-dot {
+    height: 43px;
+    width: 43px;
+  }
+  #pinUnlock {
+    min-height: 0 !important;
+  }
+  .cam-stage {
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 4/3;
+  }
+  .gesture-titleline {
+    font-size: 8px;
+  }
+  .gesture-help {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .gesture-help span {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .gesture-start {
+    height: auto;
+    min-height: 44px;
+  }
+  .privacy-note {
+    line-height: 1.6;
+    font-size: 10px;
+  }
+  .bottom {
+    position: static;
+    margin: 0;
+    padding: 10px 16px 20px;
+    min-height: 0;
+  }
+  .bottom > * {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .toast {
+    position: fixed;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 16px;
+    transform: none !important;
+    width: auto;
+    max-width: none !important;
+    z-index: 100;
+  }
+  .success > div {
+    width: calc(100vw - 32px);
+    max-width: 420px;
+  }
+}
+@media (max-width: 900px) {
+  .stage.redesigned {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .welcome-scene {
+    flex: none;
+    grid-column: auto;
+    grid-row: auto;
+    max-width: 100%;
+    width: 100%;
+    height: 138px;
+    min-height: 138px;
+  }
+  .welcome-scene h2 {
+    width: auto;
+    max-width: none;
+    white-space: normal;
+  }
+  .welcome-scene .mascot-scene {
+    left: auto !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: auto !important;
+  }
+  .panel.access {
+    flex: none;
+    grid-column: auto;
+    grid-row: auto;
+    align-self: stretch;
+    max-width: 100%;
+    width: 100% !important;
+  }
+  .scene-desc {
+    width: auto;
+    white-space: normal;
+  }
+}

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OneStaff X AI 使用指南</title>
+    <style>
+      body {
+        margin: 0;
+        background: #eef4fb;
+        color: #253b56;
+        font:
+          16px/1.9 system-ui,
+          "Microsoft YaHei",
+          sans-serif;
+      }
+      main {
+        max-width: 920px;
+        margin: 40px auto;
+        padding: 36px;
+        background: #fff;
+        border: 1px solid #dce6f2;
+        border-radius: 22px;
+      }
+      h1 {
+        font-size: 32px;
+      }
+      h2 {
+        margin-top: 35px;
+        font-size: 22px;
+      }
+      a {
+        color: #316bd0;
+      }
+      code {
+        background: #edf3fb;
+        padding: 3px 6px;
+        border-radius: 5px;
+      }
+      li {
+        margin: 10px 0;
+      }
+      .note {
+        background: #eff5ff;
+        padding: 16px;
+        border-radius: 12px;
+      }
+      @media (max-width: 650px) {
+        main {
+          margin: 12px;
+          padding: 22px;
+        }
+        h1 {
+          font-size: 27px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>ONE STAFF X AI · 2026-09-19</p>
+      <h1>从目标到可下载成果</h1>
+      <p>先配置服务，再开始对话。遇到问题时根据页面提示逐项处理，已有正文和附件可以继续查看。</p>
+      <h2>一、启动工作空间</h2>
+      <ol>
+        <li>安装 Node.js 22.13 或更新版本，完整解压项目。</li>
+        <li>Windows 双击 <code>START_ONESTAFF.cmd</code>，等待依赖安装完成，保持窗口开启。</li>
+        <li>
+          打开
+          <a href="http://localhost:3000">http://localhost:3000</a
+          >。入口演示密码为1314；摄像头不可用时使用密码。
+        </li>
+        <li>选择形象、输入空间名称，进入工作台。</li>
+      </ol>
+      <p class="note">
+        入口密码和手势仅为体验交互，不是账号认证。个人数据由服务端会话隔离。关机后下次需要重新启动服务；不要删除
+        data 目录。
+      </p>
+      <h2>二、配置模型和 OpenHex</h2>
+      <ol>
+        <li>打开“设置与帮助”，点击“管理员配置”。</li>
+        <li>从 <code>data/admin-password.txt</code> 复制首次启动生成的管理员口令。</li>
+        <li>
+          模型卡片填写实际 Base URL、API Key 和模型 ID。模型 ID
+          不预置个人推理端点，请从自己的控制台复制；不要只凭产品营销名称猜测。
+        </li>
+        <li>选择总监和独立监察者的模型，保存后点击对应连接测试。</li>
+        <li>
+          OpenHex 凭据选择“个人 API Key”，填个人 Key 和专业员工 Agent ID。默认工作区不需要工作区 Key 或 slug。
+        </li>
+        <li>按需配置语音、搜索与天气；未配置的能力会明确提示。</li>
+      </ol>
+      <h2>三、对话、附件与生成文件</h2>
+      <ol>
+        <li>输入问题，点击麦克风可录音，识别结果填回输入框，由你确认发送。</li>
+        <li>“＋原文件”选择附件；上传完成后再发送。单文件20 MB，每轮8份、合计64 MB。</li>
+        <li>需要私有资料时开启知识库；聊天附件不会自动加入知识库。</li>
+        <li>回复完成后查看监察意见。点击回复下方“导出文件”，选择 DOCX、PDF、PPTX 或 Markdown。</li>
+        <li>未通过监察的内容可以导出，但文件会标明草稿。导出文件也会保存在成果中心。</li>
+        <li>
+          下载按钮出错会显示原因；提示已交给浏览器后，请查看浏览器下载列表。移动端可能显示文件预览或分享菜单。
+        </li>
+      </ol>
+      <h2>四、团队执行与草稿</h2>
+      <ol>
+        <li>点击“交给团队”或进入团队协作，说明目标、资料和交付要求。</li>
+        <li>总监生成计划后，由你点击“确认计划，开始执行”。</li>
+        <li>点击树状节点的“查看节点草稿/产出”，在独立窗口查看正文；运行中可手动刷新。</li>
+        <li>监察未通过时查看具体问题，下载草稿核对，再使用“继续修改”创建修订任务。</li>
+        <li>网络中断时先查看历史状态；出现恢复接收才继续接收，不重复发送已被受理的问题。</li>
+      </ol>
+      <h2>五、语音、跟进和设备诊断</h2>
+      <p>
+        设置中调节朗读语速和音量，保存后对后续朗读生效。试听按钮用于检查效果，停止朗读立即结束播放。部分手机浏览器由系统媒体音量控制响度。
+      </p>
+      <p>
+        总监可建议最多两个后续问题，点击只填入输入框，不自动执行。可在设置关闭；开启会增加一次模型调用。站内提醒仅在网页打开时触发。
+      </p>
+      <p>
+        “检查设备能力”检查安全连接、接口支持、权限状态和后端连接，不会自动打开摄像头或麦克风。真实硬件状态在启动采集时验证：拒绝权限时允许站点访问；设备被占用时关闭会议软件；未找到设备时检查连接和驱动；手机访问时使用
+        HTTPS。
+      </p>
+      <h2>六、手机与平板</h2>
+      <p>
+        底部导航进入主要页面，左上角菜单访问完整功能。聊天记录和长弹窗可以独立滚动，页面也可继续向下滚动。跨设备使用右上角接续功能，一次性接续码五分钟内有效。
+      </p>
+      <p>
+        网络图标表示联网状态，↓
+        表示本站接收速率；它不是整机流量或宽带测速。无传输时为零。天气根据管理员配置查询，不自动获取你的位置。
+      </p>
+      <h2>七、部署与验收</h2>
+      <p>
+        完整设计、服务配置、运行命令、备份要求和能力边界见项目 <code>README.md</code>。验证范围见
+        <code>docs/VALIDATION.md</code
+        >。插件收藏、好友和开发者实验室中标记为演示的功能，不代表已接入外部账号或已执行操作。
+      </p>
+      <p><a href="/app.html#settings">返回设置</a> · <a href="/app.html#chat">进入工作台</a></p>
+    </main>
+  </body>
+</html>
